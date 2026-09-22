@@ -294,6 +294,32 @@ theorem weight_surjective : Function.Surjective (weight (R := R) (P := P)) :=
   have ⟨p⟩ : Nonempty P := inferInstance
   fun c => ⟨c • ofPoint p, by simp⟩
 
+variable {f : P →ᵃ[R] W} {g : W →ₗ[R] R} in
+lemma comp_lift_eq_weight_of_range_preimage (f_range : Set.range f = g ⁻¹' {1}) :
+    g ∘ₗ (lift f) = weight := by
+  refine hom_ext (fun p ↦ ?_)
+  have := f_range ▸ Set.mem_range_self p
+  simpa [LinearMap.comp_apply, lift_apply_ofPoint, weight_ofPoint] using this
+
+variable {f : P →ᵃ[R] W} {g : W →ₗ[R] R} in
+lemma lift_bijective_of_injective_of_range_preimage (f_inj : Function.Injective f)
+    (f_range : Set.range f = g ⁻¹' {1}) : Function.Bijective (lift f) := by
+  constructor
+  · rw [injective_iff_map_eq_zero]
+    intro a ha
+    have : weight a = 0 := by simp [← comp_lift_eq_weight_of_range_preimage f_range, ha]
+    obtain ⟨_, rfl⟩ := weight_eq_zero_iff.mp this
+    rw [lift_apply_ofVector] at ha
+    simp [(map_eq_zero_iff _ (f.linear_injective_iff.mpr f_inj)).mp ha]
+  · intro w
+    obtain p₀ := Classical.arbitrary P
+    obtain ⟨a, ha⟩ : w - g w • f p₀ + f p₀ ∈ Set.range f := by
+      have hmem := f_range ▸ Set.mem_range_self p₀
+      have : g (w - g w • f p₀ + f p₀) = 1 := by
+        rw [map_add, map_sub, map_smul, hmem, smul_eq_mul, mul_one, sub_self, zero_add]
+      rw [f_range]; simpa using this
+    exact ⟨ofVector (a -ᵥ p₀) + g w • ofPoint p₀, by simp [ha]⟩
+
 /-- An affine map between two affine spaces extends to a linear map between their homogenizations.
 -/
 @[expose]

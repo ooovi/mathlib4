@@ -17,7 +17,7 @@ public section
 
 variable {R V W A : Type*}
 
-open Convexity ConvexSet Affine IsHomogenization
+open Convexity Affine IsHomogenization
 
 section Ring
 
@@ -33,7 +33,7 @@ variable (ℋ : IsHomogenization R A W)
 open PointedCone
 
 /-- The homogenization of a polytope is a finitely generated cone. -/
-theorem IsPolytope.homogenize_fg {C : ConvexSet R A} (hCfg : IsPolytope R (C : Set A)) :
+theorem IsPolytope.homogenize_fg {C : Set A} (hC : IsConvexSet R C) (hCfg : IsPolytope R C) :
     (homogenize ℋ C).FG := by
   obtain ⟨t, ht⟩ := hCfg
   have : C = ⟨convexHull R t, IsConvexSet.convexHull⟩ := SetLike.ext' ht

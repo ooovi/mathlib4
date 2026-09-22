@@ -5,16 +5,21 @@ Authors: Martin Winter, Olivia Röhrig
 -/
 module
 
-public import Polyhedral.Mathlib.Geometry.Convex.Cone.Pointed.Convexity
-public import Polyhedral.Mathlib.LinearAlgebra.AffineSpace.Homogenization.Basic
+public import Mathlib.Geometry.Convex.Cone.Pointed
+public import Mathlib.Geometry.Convex.Cone.Convexity
+public import Mathlib.LinearAlgebra.AffineSpace.Homogenization.Basic
 
-import Polyhedral.Mathlib.Geometry.Convex.ConvexSpace.AffineMap
+public import Mathlib.Geometry.Convex.ConvexSpace.AffineMap
+public import Mathlib.Geometry.Convex.ConvexSpace.Module
+public import Mathlib.Geometry.Convex.ConvexSpace.Defs
+public import Mathlib.Geometry.Convex.ConvexSpace.AffineSpace
+public import Mathlib.Geometry.Convex.Hull
 
 /-! This file proves results about the interaction of homogenization and convexity. -/
 
 public section
 
-open Convexity Pointwise Set PointedCone Submodule
+open Convexity Pointwise Set PointedCone Submodule ConvexSpace
 
 namespace Convexity
 
@@ -42,6 +47,7 @@ theorem exists_sConvexComb_preimage_of_mem_hull {x} {s : Set W} (hs : s ⊆ Set.
   constructor
   · -- the convex combo yields x
     apply ℋ.ofPoint_injective
+    have := AffineMap.isAffineMap ℋ.ofPoint
     rw [ℋ.ofPoint.isAffineMap.map_sConvexComb, sConvexComb_eq_sum,
       StdSimplex.weights_map, ← hc, Finsupp.mapDomain_comapDomain _ ℋ.ofPoint_injective]
     exact ha.trans hs
