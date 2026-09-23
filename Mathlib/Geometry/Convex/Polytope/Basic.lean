@@ -46,8 +46,8 @@ variable [Semiring R] [PartialOrder R] [IsStrictOrderedRing R]
 variable [ConvexSpace R X]
 
 variable (R) in
-/-- A set is a *polytope* if it is the convex hull of finitely many points. This is the V-polytope
-definition of convex polytope. -/
+/-- A set is a *polytope* if it is the convex hull of finitely many points. This is the V-definition
+of a convex polytope. -/
 def IsPolytope (s : Set X) : Prop := ∃ t : Finset X, s = convexHull R t
 
 end Semiring
@@ -60,6 +60,11 @@ variable [Semiring R] [PartialOrder R] [IsStrictOrderedRing R]
 variable [ConvexSpace R X]
 
 variable {P P₁ P₂ : Set X}
+
+theorem isPolytope_def : IsPolytope R P ↔ ∃ t : Finset X, P = convexHull R t := by rfl
+
+theorem exists_finset_convexHull (h : IsPolytope R P) : ∃ t : Finset X, P = convexHull R t :=
+  isPolytope_def.mp h
 
 lemma isConvexSet (hP : IsPolytope R P) : IsConvexSet R P := by
   obtain ⟨_, rfl⟩ := hP

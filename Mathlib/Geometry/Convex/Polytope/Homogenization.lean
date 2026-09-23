@@ -3,12 +3,12 @@ Copyright (c) 2026 Olivia Röhrig, Martin Winter. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Olivia Röhrig, Martin Winter
 -/
+
 module
 
+public import Mathlib.Geometry.Convex.ConvexSpace.Homogenization
 public import Mathlib.Geometry.Convex.Polytope.Basic
-public import Mathlib.Geometry.Convex.ConvexSpace.Defs
-
-import Mathlib.Geometry.Convex.ConvexSpace.Homogenization
+public import Mathlib.Geometry.Convex.Set.Homogenization
 
 /-! This file proves results about the relation between polytopes and FG cones via
 homogenization. -/
@@ -17,7 +17,7 @@ public section
 
 variable {R V W A : Type*}
 
-open Convexity Affine IsHomogenization
+open Convexity ConvexSet Affine IsHomogenization
 
 section Ring
 
@@ -33,9 +33,9 @@ variable (ℋ : IsHomogenization R A W)
 open PointedCone
 
 /-- The homogenization of a polytope is a finitely generated cone. -/
-theorem IsPolytope.homogenize_fg {C : Set A} (hC : IsConvexSet R C) (hCfg : IsPolytope R C) :
+theorem IsPolytope.homogenize_fg {C : ConvexSet R A} (hCfg : IsPolytope R (C : Set A)) :
     (homogenize ℋ C).FG := by
-  obtain ⟨t, ht⟩ := hCfg
+  obtain ⟨t, ht⟩ := hCfg.exists_finset_convexHull
   have : C = ⟨convexHull R t, IsConvexSet.convexHull⟩ := SetLike.ext' ht
   have := congrArg (ConvexSet.homogenize ℋ) this
   rw [this]
@@ -48,7 +48,7 @@ theorem IsPolytope.homogenize_fg {C : Set A} (hC : IsConvexSet R C) (hCfg : IsPo
 /-- A convex set is a polytope iff its homogenization is a finitely generated cone. -/
 theorem IsPolytope.iff_homogenize_fg {C : ConvexSet R A} :
     IsPolytope R (C : Set A) ↔ (homogenize ℋ C).FG := by classical
-  refine ⟨homogenize_fg _, fun hfg ↦ ?_⟩
+  refine ⟨fun h ↦ homogenize_fg ℋ h, fun hfg ↦ IsPolytope.isPolytope_def.mpr ?_⟩
   -- get cone generators that lie in the embedding of A
   obtain ⟨g, hg, hs⟩ := homogenize_fg_ofPoint_range hfg
   -- un-embed them
@@ -71,22 +71,22 @@ theorem IsPolytope.iff_homogenize_fg {C : ConvexSet R A} :
 
 end Ring
 
-section Field
+-- section Field
 
-variable [Field R] [LinearOrder R] [IsStrictOrderedRing R]
-variable [AddCommGroup V] [Module R V]
-variable [AddCommGroup W] [Module R W] [ConvexSpace R W]
-variable [AddTorsor V A] [ConvexSpace R A] [IsAffineConvexSpace R V A]
+-- variable [Field R] [LinearOrder R] [IsStrictOrderedRing R]
+-- variable [AddCommGroup V] [Module R V]
+-- variable [AddCommGroup W] [Module R W] [ConvexSpace R W]
+-- variable [AddTorsor V A] [ConvexSpace R A] [IsAffineConvexSpace R V A]
 
-variable [IsModuleConvexSpace R W]
+-- variable [IsModuleConvexSpace R W]
 
-variable {ℋ : IsHomogenization R A W}
+-- variable {ℋ : IsHomogenization R A W}
 
-open Pointwise Submodule in
-/-- Dehomogenizing a finitely generated positive cone yields a polytope. -/
-theorem FG.dehomogenize_isPolytope {C : PointedCone R W} (h : C.FG)
-    (hc : C ≤ ℋ.weight.positive) : IsPolytope R (dehomogenize ℋ C : Set A) := by
-  rw [IsPolytope.iff_homogenize_fg ℋ]
-  simpa [homogenize_dehomogenize_of_le_positive hc]
+-- open Pointwise Submodule in
+-- /-- Dehomogenizing a finitely generated positive cone yields a polytope. -/
+-- theorem FG.dehomogenize_isPolytope {C : PointedCone R W} (h : C.FG)
+--     (hc : C ≤ ℋ.weight.positive) : IsPolytope R (dehomogenize ℋ C : Set A) := by
+--   rw [IsPolytope.iff_homogenize_fg ℋ]
+--   simpa [homogenize_dehomogenize_of_le_positive hc]
 
-end Field
+-- end Field
